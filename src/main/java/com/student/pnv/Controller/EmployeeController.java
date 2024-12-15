@@ -1,7 +1,9 @@
 package com.student.pnv.Controller;
 
 import com.student.pnv.constant.GENDER;
-import org.springframework.http.HttpStatus;
+import com.student.pnv.dto.JSonResponse;
+import com.student.pnv.exception.AppException;
+import com.student.pnv.exception.ErrorCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.student.pnv.model.Employee;
@@ -26,41 +28,52 @@ public class EmployeeController {
             )
     );
     @GetMapping
-    public ResponseEntity<List<Employee>> getEmployees() {
-        return ResponseEntity.ok(employees);
-    };
+    public ResponseEntity<?> getEmployees() {
+        return JSonResponse.ok(employees);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getEmployeeByID(@PathVariable("id") UUID id) {
+        return employees.stream()
+                .filter(e -> e.getId().equals(id))
+                .findFirst()
+                .map(JSonResponse::ok)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXIST));
+    }
 
     @PostMapping
-    public ResponseEntity<Employee> addEmployees(@RequestBody Employee NewEmployees) {
+    public ResponseEntity<?> addEmployees(@RequestBody Employee NewEmployees) {
+        NewEmployees.setId(UUID.randomUUID());
         employees.add(NewEmployees);
-        return ResponseEntity.status(HttpStatus.CREATED).body(NewEmployees);
+        return JSonResponse.created(NewEmployees);
     };
 
     @PutMapping
-    public ResponseEntity<Employee> updateEmployees(@RequestBody Employee NewEmployees) {
-        for (Employee emp : employees) {
-            if (emp.getId().equals(NewEmployees.getId())) {
-                emp.setName(NewEmployees.getName());
-                emp.setGender(NewEmployees.getGender());
-                emp.setSalary(NewEmployees.getSalary());
-                emp.setPhone(NewEmployees.getPhone());
-                emp.setDob(NewEmployees.getDob());
+    public ResponseEntity<?> updateEmployee(@PathVariable("id") UUID id, @RequestBody Employee employee) {
+        return employees.stream()
+                .filter(e -> e.getId().equals(id))
+                .findFirst()
+                .map(e -> {
+                    e.setName(employee.getName());
+                    e.setDob(employee.getDob());
+                    e.setGender(employee.getGender());
+                    e.setSalary(employee.getSalary());
+                    e.setPhone(employee.getPhone());
 
-                return ResponseEntity.status(HttpStatus.CREATED).body(emp);
-            }
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                    return JSonResponse.ok(e);
+                })
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXIST));
     }
 
     @DeleteMapping
-    public ResponseEntity<Employee> deleteEmployees(@RequestBody Employee NewEmployees) {
-        for (Employee emp : employees) {
-            if (emp.getId().equals(NewEmployees.getId())) {
-                employees.remove(emp);
-
-                return ResponseEntity.status(HttpStatus.OK).body(emp);
-            }
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    public ResponseEntity<?> deleteEmployee(@PathVariable("id") UUID id) {
+        return employees.stream()
+                .filter(e -> e.getId().equals(id))
+                .findFirst()
+                .map(e -> {
+                    employees.remove(e);
+                    return JSonResponse.noContent();
+                })
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXIST));
     }
 }
