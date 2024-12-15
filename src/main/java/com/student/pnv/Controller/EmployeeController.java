@@ -20,7 +20,6 @@ import java.util.UUID;
 @CrossOrigin("http://localhost:5173")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EmployeeController {
-
     IEmployeeService employeeService;
 
     public EmployeeController(IEmployeeService employeeService) {
