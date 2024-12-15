@@ -1,11 +1,11 @@
 <template>
   <div>
+    <!-- Existing Table Section -->
     <h1 class="text-2xl font-bold mb-4">Danh sách nhân viên</h1>
     <button @click="fetchEmployees" class="bg-blue-500 text-white py-2 px-4 rounded">
       Load Employees
     </button>
 
-    <!-- Employee Table -->
     <table class="table-auto w-full mt-4 border-collapse border">
       <thead>
         <tr class="bg-gray-200">
@@ -15,6 +15,7 @@
           <th class="border px-4 py-2">Giới tính</th>
           <th class="border px-4 py-2">Lương</th>
           <th class="border px-4 py-2">SĐT</th>
+          <th class="border px-4 py-2">DEPARTERMENT</th>
           <th class="border px-4 py-2">Actions</th>
         </tr>
       </thead>
@@ -26,6 +27,7 @@
           <td class="border px-4 py-2">{{ employee.gender }}</td>
           <td class="border px-4 py-2">{{ formatSalary(employee.salary) }} ₫</td>
           <td class="border px-4 py-2">{{ employee.phone }}</td>
+          <td class="border px-4 py-2">{{ employee.departerment }}</td>
           <td class="border px-4 py-2">
             <button
               @click="openEditModal(employee)"
@@ -39,112 +41,180 @@
             >
               Delete
             </button>
+            <button
+              @click="viewDetail(employee)"
+              class="bg-blue-500 text-white py-1 px-2 rounded"
+            >
+              View Detail
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
 
-    <!-- Update Modal -->
-    <div v-if="showModal" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-      <div class="bg-white p-6 rounded shadow-lg w-1/2">
-        <h2 class="text-xl font-bold mb-4">Cập nhật thông tin nhân viên</h2>
-        <form @submit.prevent="submitUpdate">
-          <div class="mb-2">
-            <label class="block">Tên</label>
-            <input v-model="editEmployee.name" class="w-full border p-2 rounded" />
-          </div>
-          <div class="mb-2">
-            <label class="block">Ngày sinh</label>
-            <input type="date" v-model="editEmployee.dob" class="w-full border p-2 rounded" />
-          </div>
-          <div class="mb-2">
-            <label class="block">Giới tính</label>
-            <select v-model="editEmployee.gender" class="w-full border p-2 rounded">
-              <option value="MALE">Nam</option>
-              <option value="FEMALE">Nữ</option>
-            </select>
-          </div>
-          <div class="mb-2">
-            <label class="block">Lương</label>
-            <input v-model.number="editEmployee.salary" class="w-full border p-2 rounded" />
-          </div>
-          <div class="mb-2">
-            <label class="block">SĐT</label>
-            <input v-model="editEmployee.phone" class="w-full border p-2 rounded" />
-          </div>
-          <div class="flex justify-end mt-4">
-            <button type="button" @click="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded mr-2">
-              Hủy
-            </button>
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
-              Cập nhật
-            </button>
-          </div>
-        </form>
+    <div v-if="showDetailModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center">
+      <div class="bg-white p-6 rounded-lg w-1/3">
+        <h2 class="text-xl font-bold mb-4">Chi tiết nhân viên</h2>
+        <p><strong>Tên:</strong> {{ selectedEmployee.name }}</p>
+        <p><strong>Ngày sinh:</strong> {{ selectedEmployee.dob }}</p>
+        <p><strong>Giới tính:</strong> {{ selectedEmployee.gender }}</p>
+        <p><strong>Lương:</strong> {{ formatSalary(selectedEmployee.salary) }} ₫</p>
+        <p><strong>SĐT:</strong> {{ selectedEmployee.phone }}</p>
+        <div class="mt-4 flex justify-end">
+          <button
+            @click="closeDetailModal"
+            class="bg-gray-500 text-white px-4 py-2 rounded"
+          >
+            Close
+          </button>
+        </div>
       </div>
+    </div>
+
+    <div class="bg-gray-100 mt-8 p-4 rounded-lg shadow">
+      <h2 class="text-lg font-bold mb-4">Tìm kiếm nhân viên</h2>
+      <form @submit.prevent="searchEmployees" class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="block mb-1 text-gray-700">Tên (Tìm kiếm gần đúng)</label>
+          <input
+            v-model="searchForm.name"
+            type="text"
+            class="w-full border rounded p-2"
+            placeholder="Nhập tên"
+          />
+        </div>
+
+        <div>
+          <label class="block mb-1 text-gray-700">Ngày sinh từ</label>
+          <input
+            v-model="searchForm.dobFrom"
+            type="date"
+            class="w-full border rounded p-2"
+          />
+        </div>
+
+        <div>
+          <label class="block mb-1 text-gray-700">Ngày sinh đến</label>
+          <input
+            v-model="searchForm.dobTo"
+            type="date"
+            class="w-full border rounded p-2"
+          />
+        </div>
+
+        <div>
+          <label class="block mb-1 text-gray-700">Giới tính</label>
+          <select
+            v-model="searchForm.gender"
+            class="w-full border rounded p-2"
+          >
+            <option value="">Tất cả</option>
+            <option value="MALE">Nam</option>
+            <option value="FEMALE">Nữ</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-1 text-gray-700">Mức lương</label>
+          <select
+            v-model="searchForm.salaryRange"
+            class="w-full border rounded p-2"
+          >
+            <option value="">Tất cả</option>
+            <option value="0-1000">Dưới 1000</option>
+            <option value="1000-2000">1000 - 2000</option>
+            <option value="2000+">Trên 2000</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-1 text-gray-700">Số điện thoại (Tìm kiếm gần đúng)</label>
+          <input
+            v-model="searchForm.phone"
+            type="text"
+            class="w-full border rounded p-2"
+            placeholder="Nhập số điện thoại"
+          />
+        </div>
+
+        <div>
+          <label class="block mb-1 text-gray-700">Tìm bộ phận</label>
+          <select
+            v-model="searchForm.departerment"
+            class="w-full border rounded p-2"
+          >
+            <option value="0">Tất cả</option>
+            <option value="1">Quản lí</option>
+            <option value="2">Kế toán</option>
+            <option value="3">Sản xuất</option>
+            <option value="4">Sale</option>
+          </select>
+        </div>
+
+        <div class="col-span-3 flex justify-end gap-2 mt-4">
+          <button
+            type="button"
+            @click="resetSearch"
+            class="bg-gray-500 text-white px-4 py-2 rounded"
+          >
+            Đặt lại
+          </button>
+          <button
+            type="submit"
+            class="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Tìm kiếm
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </template>
 
 <script>
-import {
-  getEmployees,
-  updateEmployee,
-  deleteEmployee,
-} from "../services/employeeService";
+import { getEmployees, deleteEmployee } from "../services/employeeService";
 
 export default {
-  name: "EmployeeTable",
   data() {
     return {
       employees: [],
-      showModal: false,
-      editEmployee: {
-        id: null,
+      searchForm: {
         name: "",
-        dob: "",
+        dobFrom: "",
+        dobTo: "",
         gender: "",
-        salary: 0,
+        salaryRange: "",
         phone: "",
+        departerment: "",
       },
     };
   },
   methods: {
-    // Fetch all employees
     async fetchEmployees() {
       try {
         this.employees = await getEmployees();
       } catch (error) {
-        console.error("Failed to load employees:", error);
+        console.error("Failed to fetch employees:", error);
       }
     },
 
-    // Open the modal and fill with selected employee data
-    openEditModal(employee) {
-      this.editEmployee = { ...employee };
-      this.showModal = true;
+    searchEmployees() {
+      console.log("Search criteria:", this.searchForm);
     },
 
-    // Submit updated employee data
-    async submitUpdate() {
-      try {
-        const result = await updateEmployee(this.editEmployee);
-        const index = this.employees.findIndex((emp) => emp.id === result.id);
-        if (index !== -1) {
-          this.employees.splice(index, 1, result);
-        }
-        this.closeModal();
-      } catch (error) {
-        console.error("Failed to update employee:", error);
-      }
+    resetSearch() {
+      this.searchForm = {
+        name: "",
+        dobFrom: "",
+        dobTo: "",
+        gender: "",
+        salaryRange: "",
+        phone: "",
+        departerment: "",
+      };
+      this.fetchEmployees();
     },
 
-    // Close modal
-    closeModal() {
-      this.showModal = false;
-    },
-
-    // Delete an employee
     async deleteEmployee(employee) {
       try {
         await deleteEmployee(employee);
@@ -154,7 +224,6 @@ export default {
       }
     },
 
-    // Format salary to display with commas
     formatSalary(salary) {
       return salary.toLocaleString();
     },
@@ -165,6 +234,5 @@ export default {
 };
 </script>
 
-<style>
-/* Optional: Style for modal backdrop */
+<style scoped>
 </style>
