@@ -1,6 +1,6 @@
 package com.student.pnv.repository;
 
-import com.student.pnv.model.Student;
+import com.student.pnv.modal.Student;
 
 import java.util.List;
 import java.util.UUID;

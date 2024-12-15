@@ -1,4 +1,4 @@
-package com.student.pnv.model;
+package com.student.pnv.modal;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;

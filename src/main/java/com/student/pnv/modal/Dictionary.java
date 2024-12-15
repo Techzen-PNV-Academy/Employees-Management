@@ -1,4 +1,4 @@
-package com.student.pnv.model;
+package com.student.pnv.modal;
 
 public class Dictionary {
     private int id;

@@ -1,7 +1,7 @@
-package com.student.pnv.model;
+package com.student.pnv.modal;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.student.pnv.constant.GENDER;
+import com.student.pnv.ENUM.GENDER;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -19,8 +19,12 @@ public class Employee {
     UUID id;
     String name;
     LocalDate dob;
-    GENDER gender;
+    Gender gender;
     double salary;
     String phone;
     Integer departmentId;
+
+    public enum Gender {
+        MALE, FEMALE, OTHER;
+    }
 }

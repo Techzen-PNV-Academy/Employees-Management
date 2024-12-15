@@ -1,4 +1,5 @@
-package com.student.pnv.dto;
+package com.student.pnv.util;
+import com.student.pnv.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

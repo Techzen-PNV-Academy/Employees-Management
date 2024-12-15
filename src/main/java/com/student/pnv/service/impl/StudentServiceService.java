@@ -1,8 +1,9 @@
-package com.student.pnv.service;
+package com.student.pnv.service.impl;
 
-import com.student.pnv.model.Student;
+import com.student.pnv.modal.Student;
 import com.student.pnv.repository.IStudentRepository;
-import com.student.pnv.repository.StudentRepository;
+import com.student.pnv.repository.impl.StudentRepository;
+import com.student.pnv.service.IStudentService;
 
 import java.util.List;
 import java.util.UUID;

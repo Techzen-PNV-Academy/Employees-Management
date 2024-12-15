@@ -1,9 +1,9 @@
 package com.student.pnv.Controller;
 
-import com.student.pnv.dto.JSonResponse;
+import com.student.pnv.util.JSonResponse;
 import com.student.pnv.exception.AppException;
 import com.student.pnv.exception.ErrorCode;
-import com.student.pnv.model.Department;
+import com.student.pnv.modal.Department;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @CrossOrigin(value = "http://localhost:5173")

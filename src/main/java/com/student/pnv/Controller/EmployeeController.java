@@ -1,102 +1,63 @@
 package com.student.pnv.Controller;
 
-import com.student.pnv.constant.GENDER;
-import com.student.pnv.dto.JSonResponse;
-import com.student.pnv.exception.AppException;
-import com.student.pnv.exception.ErrorCode;
+import com.student.pnv.dto.ApiResponse;
+import com.student.pnv.dto.employee.EmployeeSearchRequest;
+import com.student.pnv.service.IEmployeeService;
+import com.student.pnv.util.JSonResponse;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.student.pnv.model.Employee;
+import com.student.pnv.modal.Employee;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/employees")
 @CrossOrigin("http://localhost:5173")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EmployeeController {
-    private List<Employee> employees = new ArrayList<>(
-            Arrays.asList(
-                    new Employee(UUID.randomUUID(), "Nguyen Van Duc", LocalDate.of(1990, 5, 15), GENDER.FEMALE, 1500.0, "0901234567",2),
-                    new Employee(UUID.randomUUID(), "Tran Duc Phat", LocalDate.of(1995, 8, 20),GENDER.MALE , 2000.0, "0902234567",1),
-                    new Employee(UUID.randomUUID(), "Le Van Viet", LocalDate.of(1992, 12, 10), GENDER.MALE , 1800.0, "0903234567",3),
-                    new Employee(UUID.randomUUID(), "Nguyen Nghia", LocalDate.of(1997, 3, 25), GENDER.MALE , 2200.0, "0904234567",4),
-                    new Employee(UUID.randomUUID(), "A Tan", LocalDate.of(1998, 7, 5), GENDER.FEMALE , 1600.0, "0905234567",1)
-            )
-    );
-    @GetMapping
-    public ResponseEntity<?> getEmployees() {
-        return JSonResponse.ok(employees);
+
+    IEmployeeService employeeService;
+
+    public EmployeeController(IEmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<Employee>>> getEmployees(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dobFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dobTo,
+            @RequestParam(required = false) Employee.Gender gender,
+            @RequestParam(required = false) String salaryRange,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) Integer departmentId
+    ) {
+        EmployeeSearchRequest request = new EmployeeSearchRequest(name, dobFrom, dobTo, gender, salaryRange, phone, departmentId);
+        return JSonResponse.ok(employeeService.findByAttributes(request));
+    };
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getEmployeeByID(@PathVariable("id") UUID id) {
-        return employees.stream()
-                .filter(e -> e.getId().equals(id))
-                .findFirst()
-                .map(JSonResponse::ok)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXIST));
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<?> searchEmployees(
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "dobFrom", required = false) LocalDate dobFrom,
-            @RequestParam(value = "dobTo", required = false) LocalDate dobTo,
-            @RequestParam(value = "phone", required = false) String phone,
-            @RequestParam(value = "gender", required = false) GENDER gender,
-            @RequestParam(value = "salary", required = false) Double salary,
-            @RequestParam(value = "department", required = false) Integer departmentId) {
-
-        List<Employee> filteredEmployees = employees.stream()
-                .filter(e -> (name == null || e.getName().toLowerCase().contains(name.toLowerCase())))
-                .filter(e -> (dobFrom == null || !e.getDob().isBefore(dobFrom)))
-                .filter(e -> (dobTo == null || !e.getDob().isAfter(dobTo)))
-                .filter(e -> (phone == null || e.getPhone().equals(phone)))
-                .filter(e -> (gender == null || e.getGender().equals(gender)))
-                .filter(e -> (salary == null || e.getSalary() == (salary)))
-                .filter(e -> (departmentId == null || e.getDepartmentId().equals(departmentId)))
-                .toList();
-
-        return ResponseEntity.ok(filteredEmployees);
+    public ResponseEntity<ApiResponse<Employee>> getEmployees(@PathVariable UUID id) {
+        return JSonResponse.ok(employeeService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<?> addEmployees(@RequestBody Employee NewEmployees) {
-        NewEmployees.setId(UUID.randomUUID());
-        employees.add(NewEmployees);
-        return JSonResponse.created(NewEmployees);
+    public ResponseEntity<ApiResponse<Employee>> addEmployees(@RequestBody Employee NewEmployees) {
+        return JSonResponse.created(employeeService.save(NewEmployees));
     };
 
     @PutMapping
-    public ResponseEntity<?> updateEmployee(@PathVariable("id") UUID id, @RequestBody Employee employee) {
-        return employees.stream()
-                .filter(e -> e.getId().equals(id))
-                .findFirst()
-                .map(e -> {
-                    e.setName(employee.getName());
-                    e.setDob(employee.getDob());
-                    e.setGender(employee.getGender());
-                    e.setSalary(employee.getSalary());
-                    e.setPhone(employee.getPhone());
-
-                    return JSonResponse.ok(e);
-                })
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXIST));
+    public ResponseEntity<ApiResponse<Employee>> updateEmployees(@RequestBody Employee NewEmployees) {
+        return JSonResponse.ok(employeeService.update(NewEmployees));
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> deleteEmployee(@PathVariable("id") UUID id) {
-        return employees.stream()
-                .filter(e -> e.getId().equals(id))
-                .findFirst()
-                .map(e -> {
-                    employees.remove(e);
-                    return JSonResponse.noContent();
-                })
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXIST));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Employee>> deleteEmployees(@PathVariable UUID id) {
+        return JSonResponse.ok(employeeService.delete(id));
     }
 }
