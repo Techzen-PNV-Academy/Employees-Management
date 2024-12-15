@@ -41,7 +41,7 @@ public class EmployeeController {
     };
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Employee>> getEmployees(@PathVariable UUID id) {
+    public ResponseEntity<ApiResponse<Employee>> findEmployee(@PathVariable UUID id) {
         return JSonResponse.ok(employeeService.findById(id));
     }
 
