@@ -22,4 +22,5 @@ public class Employee {
     GENDER gender;
     double salary;
     String phone;
+    Integer departmentId;
 }

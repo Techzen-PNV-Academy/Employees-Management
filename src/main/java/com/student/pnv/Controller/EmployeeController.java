@@ -20,11 +20,11 @@ import java.util.UUID;
 public class EmployeeController {
     private List<Employee> employees = new ArrayList<>(
             Arrays.asList(
-                    new Employee(UUID.randomUUID(), "Nguyen Van Duc", LocalDate.of(1990, 5, 15), GENDER.FEMALE, 1500.0, "0901234567"),
-                    new Employee(UUID.randomUUID(), "Tran Duc Phat", LocalDate.of(1995, 8, 20),GENDER.MALE , 2000.0, "0902234567"),
-                    new Employee(UUID.randomUUID(), "Le Van Viet", LocalDate.of(1992, 12, 10), GENDER.MALE , 1800.0, "0903234567"),
-                    new Employee(UUID.randomUUID(), "Nguyen Nghia", LocalDate.of(1997, 3, 25), GENDER.MALE , 2200.0, "0904234567"),
-                    new Employee(UUID.randomUUID(), "A Tan", LocalDate.of(1998, 7, 5), GENDER.FEMALE , 1600.0, "0905234567")
+                    new Employee(UUID.randomUUID(), "Nguyen Van Duc", LocalDate.of(1990, 5, 15), GENDER.FEMALE, 1500.0, "0901234567",2),
+                    new Employee(UUID.randomUUID(), "Tran Duc Phat", LocalDate.of(1995, 8, 20),GENDER.MALE , 2000.0, "0902234567",1),
+                    new Employee(UUID.randomUUID(), "Le Van Viet", LocalDate.of(1992, 12, 10), GENDER.MALE , 1800.0, "0903234567",3),
+                    new Employee(UUID.randomUUID(), "Nguyen Nghia", LocalDate.of(1997, 3, 25), GENDER.MALE , 2200.0, "0904234567",4),
+                    new Employee(UUID.randomUUID(), "A Tan", LocalDate.of(1998, 7, 5), GENDER.FEMALE , 1600.0, "0905234567",1)
             )
     );
     @GetMapping
@@ -39,6 +39,29 @@ public class EmployeeController {
                 .findFirst()
                 .map(JSonResponse::ok)
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXIST));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchEmployees(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "dobFrom", required = false) LocalDate dobFrom,
+            @RequestParam(value = "dobTo", required = false) LocalDate dobTo,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "gender", required = false) GENDER gender,
+            @RequestParam(value = "salary", required = false) Double salary,
+            @RequestParam(value = "department", required = false) Integer departmentId) {
+
+        List<Employee> filteredEmployees = employees.stream()
+                .filter(e -> (name == null || e.getName().toLowerCase().contains(name.toLowerCase())))
+                .filter(e -> (dobFrom == null || !e.getDob().isBefore(dobFrom)))
+                .filter(e -> (dobTo == null || !e.getDob().isAfter(dobTo)))
+                .filter(e -> (phone == null || e.getPhone().equals(phone)))
+                .filter(e -> (gender == null || e.getGender().equals(gender)))
+                .filter(e -> (salary == null || e.getSalary() == (salary)))
+                .filter(e -> (departmentId == null || e.getDepartmentId().equals(departmentId)))
+                .toList();
+
+        return ResponseEntity.ok(filteredEmployees);
     }
 
     @PostMapping
