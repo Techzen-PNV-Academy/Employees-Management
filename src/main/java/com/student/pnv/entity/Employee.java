@@ -1,30 +1,38 @@
-package com.student.pnv.modal;
+package com.student.pnv.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.student.pnv.ENUM.GENDER;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Entity
 @Getter
+@Builder
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Employee {
-    UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    Integer id;
     String name;
     LocalDate dob;
     Gender gender;
     double salary;
     String phone;
-    Integer departmentId;
 
     public enum Gender {
         MALE, FEMALE, OTHER;
     }
+
+    @ManyToOne
+    Department department;
 }

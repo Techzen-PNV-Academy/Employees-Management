@@ -1,6 +1,6 @@
 package com.student.pnv.service.impl;
 
-import com.student.pnv.modal.Department;
+import com.student.pnv.entity.Department;
 import com.student.pnv.repository.IDepartmentRepository;
 import com.student.pnv.service.IDepartmentService;
 import lombok.AccessLevel;
@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -17,23 +17,23 @@ import java.util.UUID;
 public class DepartmentService implements IDepartmentService {
     IDepartmentRepository departmentRepository;
 
-    public Department getDepartment(Integer id) {
+    @Override
+    public List<Department> findByName(String name) {
+        return departmentRepository.findByName(name);
+    }
+
+    @Override
+    public Optional<Department> findById(int id) {
         return departmentRepository.findById(id);
     }
 
-    public List<Department> getAllDepartments() {
-        return departmentRepository.findAll();
-    }
-
-    public Department saveDepartment(Department department) {
+    @Override
+    public Department save(Department department) {
         return departmentRepository.save(department);
     }
 
-    public Department updateDepartment(Department department) {
-        return departmentRepository.update(department);
-    }
-
-    public Department deleteDepartment(Integer departmentId) {
-        return departmentRepository.delete(departmentId);
+    @Override
+    public void delete(int id) {
+        departmentRepository.deleteById(id); // use deleteById method to delete by ID
     }
 }

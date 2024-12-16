@@ -3,8 +3,7 @@ package com.student.pnv.dto.employee;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.format.annotation.DateTimeFormat;
-import com.student.pnv.modal.Employee;
-import com.student.pnv.ENUM.GENDER;
+import com.student.pnv.entity.Employee;
 
 import java.time.LocalDate;
 
@@ -20,7 +19,7 @@ public class EmployeeSearchRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     LocalDate dobTo;
     Employee.Gender gender;
-    String salaryRange;
+    String salary;
     String phone;
     Integer departmentId;
 

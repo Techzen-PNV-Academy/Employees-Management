@@ -1,19 +1,30 @@
 package com.student.pnv.service;
 
+import com.student.pnv.ENUM.GENDER;
 import com.student.pnv.dto.employee.EmployeeSearchRequest;
-import com.student.pnv.modal.Employee;
+import com.student.pnv.entity.Department;
+import com.student.pnv.entity.Employee;
+import com.student.pnv.repository.IEmployeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
+@Service
 public interface IEmployeeService {
-    List<Employee> findByAttributes(EmployeeSearchRequest employeeSearchRequest);
+    @Autowired
+    IEmployeeRepository employeeRepository = null;
 
-    Employee findById(UUID id);
+    List<Employee> findByAttr(String name, GENDER gender, LocalDate dob, Double minSalary, Double maxSalary, Department departmentId);
+
+    List<Employee> findAll();
+
+    Employee findById(Integer id);
 
     Employee save(Employee employee);
 
     Employee update(Employee employee);
 
-    Employee delete(UUID id);
+    Void delete(Integer id);
 }

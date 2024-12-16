@@ -1,6 +1,6 @@
 package com.student.pnv.service;
 
-import com.student.pnv.modal.Student;
+import com.student.pnv.entity.Student;
 
 import java.util.List;
 import java.util.UUID;

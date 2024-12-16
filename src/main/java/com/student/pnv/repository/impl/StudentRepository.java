@@ -1,6 +1,6 @@
 package com.student.pnv.repository.impl;
 
-import com.student.pnv.modal.Student;
+import com.student.pnv.entity.Student;
 import com.student.pnv.repository.IStudentRepository;
 
 import java.util.ArrayList;

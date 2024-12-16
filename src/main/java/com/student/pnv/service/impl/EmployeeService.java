@@ -1,7 +1,9 @@
 package com.student.pnv.service.impl;
 
+import com.student.pnv.ENUM.GENDER;
 import com.student.pnv.dto.employee.EmployeeSearchRequest;
-import com.student.pnv.modal.Employee;
+import com.student.pnv.entity.Department;
+import com.student.pnv.entity.Employee;
 import com.student.pnv.repository.IEmployeeRepository;
 import com.student.pnv.service.IEmployeeService;
 import lombok.AccessLevel;
@@ -9,8 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -18,15 +20,18 @@ import java.util.UUID;
 public class EmployeeService implements IEmployeeService {
     IEmployeeRepository employeeRepository;
 
-    @Override
-    public List<Employee> findByAttributes(EmployeeSearchRequest employeeSearchRequest) {
-        return employeeRepository.findByAttributes(employeeSearchRequest);
+    public List<Employee> findByAttr(String name, GENDER gender, LocalDate dob, Double minSalary, Double maxSalary, Department department) {
+        return employeeRepository.findByAttr(name, gender, dob, minSalary, maxSalary, department);
     }
 
+    @Override
+    public List<Employee> findAll() {
+        return employeeRepository.findAll();
+    }
 
     @Override
-    public Employee findById(UUID id) {
-        return employeeRepository.findById(id);
+    public Employee findById(Integer id) {
+        return employeeRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -36,11 +41,15 @@ public class EmployeeService implements IEmployeeService {
 
     @Override
     public Employee update(Employee employee) {
-        return employeeRepository.update(employee);
+        if (!employeeRepository.existsById(employee.getId())) {
+            throw new Error("Employee not found with ID: " + employee.getId());
+        }
+        return employeeRepository.save(employee);
     }
 
     @Override
-    public Employee delete(UUID id) {
-        return employeeRepository.delete(id);
+    public Void delete(Integer id) {
+        employeeRepository.deleteById(id);
+        return null;
     }
 }

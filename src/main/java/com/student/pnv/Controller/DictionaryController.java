@@ -1,7 +1,7 @@
 package com.student.pnv.Controller;
 
-import com.student.pnv.modal.Dictionary;
-import com.student.pnv.modal.TuDien;
+import com.student.pnv.entity.Dictionary;
+import com.student.pnv.entity.TuDien;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

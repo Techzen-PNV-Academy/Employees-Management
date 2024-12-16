@@ -3,7 +3,7 @@ package com.student.pnv.Controller;
 import com.student.pnv.dto.ApiResponse;
 import com.student.pnv.exception.AppException;
 import com.student.pnv.exception.ErrorCode;
-import com.student.pnv.modal.Student;
+import com.student.pnv.entity.Student;
 import com.student.pnv.service.impl.StudentServiceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
