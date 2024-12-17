@@ -1,27 +1,29 @@
 package com.student.pnv.service.impl;
 
-import com.student.pnv.ENUM.GENDER;
 import com.student.pnv.dto.employee.EmployeeSearchRequest;
-import com.student.pnv.entity.Department;
 import com.student.pnv.entity.Employee;
 import com.student.pnv.repository.IEmployeeRepository;
 import com.student.pnv.service.IEmployeeService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EmployeeService implements IEmployeeService {
+    @Autowired
     IEmployeeRepository employeeRepository;
 
-    public List<Employee> findByAttr(String name, GENDER gender, LocalDate dob, Double minSalary, Double maxSalary, Department department) {
-        return employeeRepository.findByAttr(name, gender, dob, minSalary, maxSalary, department);
+    @Override
+    public Page<Employee> findByAttributes(EmployeeSearchRequest employeeSearchRequest, Pageable pageable) {
+        return employeeRepository.findByAttributes(employeeSearchRequest, pageable);
     }
 
     @Override
@@ -40,11 +42,15 @@ public class EmployeeService implements IEmployeeService {
     }
 
     @Override
-    public Employee update(Employee employee) {
-        if (!employeeRepository.existsById(employee.getId())) {
-            throw new Error("Employee not found with ID: " + employee.getId());
-        }
-        return employeeRepository.save(employee);
+    public Employee update(Integer id, Employee updatedData) {
+        Employee employee = employeeRepository.findById(id).get();
+        employee.setName(updatedData.getName());
+        employee.setSalary(updatedData.getSalary());
+        employee.setPhone(updatedData.getPhone());
+        employee.setGender(updatedData.getGender());
+        employee.setId(updatedData.getId());
+        employeeRepository.save(employee);
+        return employee;
     }
 
     @Override

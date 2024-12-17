@@ -22,9 +22,9 @@ public class DepartmentController {
     IDepartmentService departmentService;
 
     @GetMapping
-    public ResponseEntity getAll(){
+    public ResponseEntity<ApiResponse<List<Department>>> getAll(){
         return JSonResponse.ok(
-                departmentService
+                departmentService.findAll()
         );
     }
 
@@ -37,19 +37,19 @@ public class DepartmentController {
 
     @PostMapping
     public ResponseEntity<?> addDepart(@RequestBody Department department) {
-        department.setId((int) (Math.random()*100000000));
         departmentService.save(department);
         return JSonResponse.created(department);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateDepart(@PathVariable("id") int id, @RequestBody Department department) {
-        return departmentService.findById(id)
-                .map(d -> {
-                    d.setName(department.getName());
-                    return JSonResponse.ok(d);
-                })
-                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_EXIST));
+    public ResponseEntity<ApiResponse<Department>> updateEmployee(@PathVariable int id, @RequestBody Department updatedData) {
+        Department department = departmentService.updateDepartment(id, updatedData);
+
+        if (department != null) {
+            return JSonResponse.ok(department);
+        } else {
+            throw new AppException(ErrorCode.DEPARTMENT_NOT_EXIST);
+        }
     }
 
     @DeleteMapping("/{id}")

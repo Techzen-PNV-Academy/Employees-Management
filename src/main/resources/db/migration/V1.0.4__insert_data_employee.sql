@@ -1,11 +1,3 @@
-INSERT INTO department (id, name) VALUES
-(1, 'HR'),
-(2, 'Finance'),
-(3, 'IT'),
-(4, 'DEV'),
-(5, 'SALE');
-
-
 INSERT INTO Employee (id, name, dob, gender, salary, phone, department_id) VALUES
 (1, 'Nguyen Van A', '1990-01-01', 1, 5000.0, '0123456789', 1),
 (2, 'Tran Thi B', '1992-02-02', 2, 6000.0, '0123456790', 2),

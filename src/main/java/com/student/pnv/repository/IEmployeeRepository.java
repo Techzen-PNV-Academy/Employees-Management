@@ -1,31 +1,24 @@
 package com.student.pnv.repository;
 
-import com.student.pnv.ENUM.GENDER;
-import com.student.pnv.entity.Department;
+import com.student.pnv.dto.employee.EmployeeSearchRequest;
 import com.student.pnv.entity.Employee;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
-import java.time.LocalDate;
-import java.util.List;
 
 public interface IEmployeeRepository extends JpaRepository<Employee, Integer> {
 
-    @Query("SELECT e FROM Employee e WHERE " +
-            "(:name IS NULL OR e.name = :name) AND " +
-            "(:gender IS NULL OR e.gender = :gender) AND " +
-            "(:dob IS NULL OR e.dob = :dob) AND " +
-            "(:minSalary IS NULL OR e.salary >= :minSalary) AND " +
-            "(:maxSalary IS NULL OR e.salary <= :maxSalary) AND " +
-            "(:department IS NULL OR e.department.id = :department)")
-    List<Employee> findByAttr(
-            @Param("name") String name,
-            @Param("gender") GENDER gender,
-            @Param("dob") LocalDate dob,
-            @Param("minSalary") Double minSalary,
-            @Param("maxSalary") Double maxSalary,
-            @Param("department") Department department
-    );
+    @Query("""
+        FROM Employee 
+        WHERE (:#{#employeeSearchRequest.name} IS NULL OR name LIKE CONCAT('%', :#{#employeeSearchRequest.name}, '%'))
+        AND (:#{#employeeSearchRequest.dobFrom} IS NULL OR dob >= :#{#employeeSearchRequest.dobFrom})
+        AND (:#{#employeeSearchRequest.dobTo} IS NULL OR dob <= :#{#employeeSearchRequest.dobTo})
+        AND (:#{#employeeSearchRequest.gender} IS NULL OR gender = :#{#employeeSearchRequest.gender})
+        AND (:#{#employeeSearchRequest.salaryRange} = 0 OR salary >= :#{#employeeSearchRequest.salaryRange})
+        AND (:#{#employeeSearchRequest.phone} IS NULL OR phone LIKE CONCAT('%', :#{#employeeSearchRequest.phone}, '%'))
+        AND (:#{#employeeSearchRequest.department} IS NULL OR department.id = :#{#employeeSearchRequest.department})
+    """)
+    Page<Employee> findByAttributes(EmployeeSearchRequest employeeSearchRequest, Pageable pageable);
 
 }

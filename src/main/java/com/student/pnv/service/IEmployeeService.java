@@ -6,6 +6,8 @@ import com.student.pnv.entity.Department;
 import com.student.pnv.entity.Employee;
 import com.student.pnv.repository.IEmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,7 +18,7 @@ public interface IEmployeeService {
     @Autowired
     IEmployeeRepository employeeRepository = null;
 
-    List<Employee> findByAttr(String name, GENDER gender, LocalDate dob, Double minSalary, Double maxSalary, Department departmentId);
+    Page<Employee> findByAttributes(EmployeeSearchRequest employeeSearchRequest, Pageable pageable);
 
     List<Employee> findAll();
 
@@ -24,7 +26,7 @@ public interface IEmployeeService {
 
     Employee save(Employee employee);
 
-    Employee update(Employee employee);
+    Employee update(Integer id, Employee updatedData);
 
     Void delete(Integer id);
 }

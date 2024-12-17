@@ -18,8 +18,9 @@ public class EmployeeSearchRequest {
     LocalDate dobFrom;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     LocalDate dobTo;
-    Employee.Gender gender;
+    String gender;
     String salary;
+    String salaryRange;
     String phone;
     Integer departmentId;
 

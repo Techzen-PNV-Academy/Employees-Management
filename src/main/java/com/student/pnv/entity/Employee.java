@@ -10,12 +10,13 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
-@AllArgsConstructor
-@NoArgsConstructor
+
 @Entity
 @Getter
-@Builder
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Employee {
@@ -25,14 +26,11 @@ public class Employee {
     Integer id;
     String name;
     LocalDate dob;
-    Gender gender;
+    String gender;
     double salary;
     String phone;
 
-    public enum Gender {
-        MALE, FEMALE, OTHER;
-    }
-
     @ManyToOne
-    Department department;
+    @JoinColumn(name = "departmentId")
+    private Department department;
 }
